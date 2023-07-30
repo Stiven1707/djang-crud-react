@@ -1,14 +1,14 @@
-import {useForm} from 'react-hook-form';
-import { createTask } from '../api/tasks.api';
-import {useNavigate} from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { createTask, deleteTask } from '../api/tasks.api';
+import { useNavigate, useParams } from 'react-router-dom';
 
 export function TaskFormPage() {
-  const { register, handleSubmit, formState:{errors} } = useForm()
-
+  const { register, handleSubmit, formState: { errors } } = useForm()
+  const params = useParams();
   const navigate = useNavigate();
 
   const onSubmit = handleSubmit(async data => {
-    const res = await createTask(data);
+    await createTask(data);
     navigate('/tasks');
   })
 
@@ -29,6 +29,19 @@ export function TaskFormPage() {
         {errors.description && <span>This field is required</span>}
         <input type="submit" value="Send" />
       </form>
+      {params.id && <button
+        onClick={async () => {
+          const accepted = window.confirm('Are you sure you want to delete this task?');
+          if (accepted) {
+            await deleteTask(params.id);
+            navigate('/tasks');
+          }
+
+        }}
+      >Delete
+      </button>
+      }
+
     </div>
   )
 }
